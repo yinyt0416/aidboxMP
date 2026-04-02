@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理 - 语音打印</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+        }
+        .sidebar {
+            width: 220px;
+            background: #001529;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .logo { height: 64px; display: flex; align-items: center; padding: 0 24px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .logo h1 { color: #fff; font-size: 18px; font-weight: 500; }
+        .nav-menu { flex: 1; padding: 16px 0; }
+        .nav-item {
+            display: flex; align-items: center; color: rgba(255,255,255,0.65);
+            text-decoration: none; padding: 12px 24px; margin: 4px 12px; border-radius: 6px;
+            font-size: 14px; transition: all 0.2s;
+        }
+        .nav-item:hover { color: #fff; background: rgba(255,255,255,0.08); }
+        .nav-item.active { color: #fff; background: #1890ff; }
+        .sidebar-footer { padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.06); }
+        .user-welcome { color: rgba(255,255,255,0.65); font-size: 13px; margin-bottom: 8px; }
+        .logout-btn {
+            width: 100%; padding: 8px 16px; background: transparent; color: rgba(255,255,255,0.65);
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; cursor: pointer; font-size: 13px;
+        }
+        .logout-btn:hover { color: #fff; border-color: rgba(255,255,255,0.4); }
+        .main-content { flex: 1; padding: 24px 32px; overflow-y: auto; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .page-header h2 { color: #262626; font-size: 24px; font-weight: 600; }
+        .add-btn {
+            padding: 10px 20px; background: #1890ff; color: #fff; border: none;
+            border-radius: 4px; cursor: pointer; font-size: 14px; transition: background 0.2s;
+        }
+        .add-btn:hover { background: #40a9ff; }
+        .table-card { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #fafafa; color: #262626; font-weight: 500; font-size: 14px; text-align: left; padding: 16px; border-bottom: 1px solid #f0f0f0; }
+        td { padding: 16px; border-bottom: 1px solid #f0f0f0; color: #595959; font-size: 14px; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fafafa; }
+        .actions { display: flex; gap: 8px; }
+        .edit-btn, .delete-btn {
+            padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; border: none; transition: all 0.2s;
+        }
+        .edit-btn { background: #e6f7ff; color: #1890ff; }
+        .edit-btn:hover { background: #bae7ff; }
+        .delete-btn { background: #fff1f0; color: #ff4d4f; }
+        .delete-btn:hover { background: #ffccc7; }
+        .empty-state { text-align: center; padding: 60px; color: #8c8c8c; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.45); justify-content: center; align-items: center; z-index: 1000; }
+        .modal.active { display: flex; }
+        .modal-content { background: #fff; padding: 24px; border-radius: 8px; width: 400px; max-width: 90%; }
+        .modal-content h3 { color: #262626; font-size: 16px; font-weight: 500; margin-bottom: 20px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; color: #262626; font-size: 14px; margin-bottom: 8px; }
+        .form-group input {
+            width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus { outline: none; border-color: #40a9ff; box-shadow: 0 0 0 2px rgba(24,144,255,0.2); }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+        .cancel-btn, .submit-btn { padding: 8px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; border: none; transition: all 0.2s; }
+        .cancel-btn { background: #fff; color: #595959; border: 1px solid #d9d9d9; }
+        .cancel-btn:hover { color: #40a9ff; border-color: #40a9ff; }
+        .submit-btn { background: #1890ff; color: #fff; }
+        .submit-btn:hover { background: #40a9ff; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="sidebar">
+            <div class="logo"><h1>语音打印</h1></div>
+            <nav class="nav-menu">
+                <a href="/index.html" class="nav-item">首页</a>
+                <a href="/users.html" class="nav-item active">用户管理</a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-welcome">欢迎，{{ username }}</div>
+                <button class="logout-btn" @click="logout">退出登录</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="page-header">
+                <h2>用户管理</h2>
+                <button class="add-btn" @click="openAddModal">添加用户</button>
+            </div>
+
+            <div class="table-card">
+                <table v-if="users.length > 0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>用户名</th>
+                            <th>昵称</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="user in users" :key="user.id">
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.nickname || '-' }}</td>
+                            <td>{{ formatTime(user.createdAt) }}</td>
+                            <td class="actions">
+                                <button class="edit-btn" @click="openEditModal(user)">编辑</button>
+                                <button class="delete-btn" @click="deleteUser(user.id)">删除</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="empty-state" v-else>
+                    <p>暂无用户数据</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal" :class="{ active: showModal }">
+            <div class="modal-content">
+                <h3>{{ isEdit ? '编辑用户' : '添加用户' }}</h3>
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" v-model="form.username" :disabled="isEdit" placeholder="请输入用户名">
+                </div>
+                <div class="form-group">
+                    <label>密码 <span v-if="isEdit" style="color: #8c8c8c; font-weight: normal;">（留空则不修改）</span></label>
+                    <input type="password" v-model="form.password" :placeholder="isEdit ? '请输入密码' : '请输入密码'">
+                </div>
+                <div class="form-group">
+                    <label>昵称</label>
+                    <input type="text" v-model="form.nickname" placeholder="请输入昵称">
+                </div>
+                <div class="modal-actions">
+                    <button class="cancel-btn" @click="closeModal">取消</button>
+                    <button class="submit-btn" @click="submitForm">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, reactive, onMounted } = Vue;
+
+        createApp({
+            setup() {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                const userStr = localStorage.getItem('user');
+                const user = JSON.parse(userStr);
+                const username = ref(user.nickname || user.username || '管理员');
+
+                const users = ref([]);
+                const showModal = ref(false);
+                const isEdit = ref(false);
+                const editId = ref(null);
+                const form = reactive({ username: '', password: '', nickname: '' });
+
+                async function loadUsers() {
+                    try {
+                        const res = await fetch('/api/users', {
+                            headers: { 'Authorization': 'Bearer ' + token }
+                        });
+                        if (!res.ok) {
+                            if (res.status === 401) logout();
+                            return;
+                        }
+                        const data = await res.json();
+                        users.value = data.list || [];
+                    } catch (err) { console.error(err); }
+                }
+
+                function openAddModal() {
+                    isEdit.value = false;
+                    editId.value = null;
+                    form.username = '';
+                    form.password = '';
+                    form.nickname = '';
+                    showModal.value = true;
+                }
+
+                function openEditModal(user) {
+                    isEdit.value = true;
+                    editId.value = user.id;
+                    form.username = user.username;
+                    form.password = '';
+                    form.nickname = user.nickname || '';
+                    showModal.value = true;
+                }
+
+                function closeModal() {
+                    showModal.value = false;
+                }
+
+                async function submitForm() {
+                    if (!form.username.trim()) { alert('请输入用户名'); return; }
+                    if (!isEdit.value && !form.password) { alert('请输入密码'); return; }
+
+                    const body = {};
+                    if (isEdit.value) {
+                        if (form.password) body.password = form.password;
+                        if (form.nickname) body.nickname = form.nickname;
+                    } else {
+                        body.username = form.username;
+                        if (form.password) body.password = form.password;
+                        if (form.nickname) body.nickname = form.nickname;
+                    }
+
+                    try {
+                        const url = isEdit.value ? `/api/users/${editId.value}` : '/api/users';
+                        const method = isEdit.value ? 'PUT' : 'POST';
+                        const res = await fetch(url, {
+                            method,
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': 'Bearer ' + token
+                            },
+                            body: JSON.stringify(body)
+                        });
+
+                        if (res.ok) {
+                            closeModal();
+                            loadUsers();
+                        } else {
+                            const data = await res.json();
+                            alert(data.message || '操作失败');
+                        }
+                    } catch (err) { alert('操作失败: ' + err.message); }
+                }
+
+                async function deleteUser(id) {
+                    if (!confirm('确定要删除该用户吗？')) return;
+                    try {
+                        const res = await fetch(`/api/users/${id}`, {
+                            method: 'DELETE',
+                            headers: { 'Authorization': 'Bearer ' + token }
+                        });
+                        if (res.ok) {
+                            loadUsers();
+                        } else {
+                            const data = await res.json();
+                            alert(data.message || '删除失败');
+                        }
+                    } catch (err) { alert('删除失败: ' + err.message); }
+                }
+
+                function formatTime(timestamp) {
+                    if (!timestamp) return '-';
+                    return new Date(timestamp).toLocaleString('zh-CN');
+                }
+
+                async function logout() {
+                    try {
+                        await fetch('/api/auth/logout', {
+                            method: 'POST',
+                            headers: { 'Authorization': 'Bearer ' + token }
+                        });
+                    } catch (err) { console.error(err); }
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = '/login.html';
+                }
+
+                onMounted(loadUsers);
+
+                return {
+                    username, users, showModal, isEdit, form,
+                    openAddModal, openEditModal, closeModal, submitForm, deleteUser,
+                    formatTime, logout
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

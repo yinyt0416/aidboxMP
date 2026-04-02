@@ -1,0 +1,99 @@
+{
+	"pages": [
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登录",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/login/bind-profile",
+			"style": {
+				"navigationBarTitleText": "完善信息",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "语音绘打印"
+			}
+		},
+		{
+			"path": "pages/generate/generate",
+			"style": {
+				"navigationBarTitleText": "生成图片"
+			}
+		},
+		{
+			"path": "pages/history/history",
+			"style": {
+				"navigationBarTitleText": "历史记录"
+			}
+		},
+		{
+			"path": "pages/detail/detail",
+			"style": {
+				"navigationBarTitleText": "图片详情"
+			}
+		},
+		{
+			"path": "pages/printer/printer",
+			"style": {
+				"navigationBarTitleText": "打印机管理"
+			}
+		},
+		{
+			"path": "pages/profile/profile",
+			"style": {
+				"navigationBarTitleText": "个人中心"
+			}
+		},
+		{
+			"path": "pages/feedback/feedback",
+			"style": {
+				"navigationBarTitleText": "帮助与反馈"
+			}
+		},
+		{
+			"path": "pages/about/about",
+			"style": {
+				"navigationBarTitleText": "关于我们"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "AIDBOX",
+		"navigationBarBackgroundColor": "#FFF8F3",
+		"backgroundColor": "#FFF8F3"
+	},
+	"tabBar": {
+		"color": "#999999",
+		"selectedColor": "#EFA87C",
+		"backgroundColor": "#FFFFFF",
+		"borderStyle": "white",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"text": "首页",
+				"iconPath": "static/icons/首页未选中.png",
+				"selectedIconPath": "static/icons/首页 (3).png"
+			},
+			{
+				"pagePath": "pages/history/history",
+				"text": "历史",
+				"iconPath": "static/icons/_历史小2未选中.png",
+				"selectedIconPath": "static/icons/_历史小2.png"
+			},
+			{
+				"pagePath": "pages/profile/profile",
+				"text": "我的",
+				"iconPath": "static/icons/我的未选中.png",
+				"selectedIconPath": "static/icons/我的.png"
+			}
+		]
+	},
+	"uniIdRouter": {}
+}

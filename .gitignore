@@ -1,0 +1,45 @@
+# Node / npm
+node_modules/
+**/node_modules/
+
+# Frontend build outputs (vue-admin / dayin / others)
+dist/
+**/dist/
+**/dist-ssr/
+**/build/
+**/unpackage/
+
+# Backend build outputs (springboot-backend)
+target/
+**/target/
+*.jar
+*.class
+*.war
+*.ear
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Local/temporary artifacts
+*.original
+uploads/
+**/uploads/
+
